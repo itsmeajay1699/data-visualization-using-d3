@@ -52,12 +52,15 @@ productRouter.get("/month", async (req, res) => {
         $project: {
           created_at: 1,
           total_price_set: 1,
+          month: { $month: { $dateFromString: { dateString: "$created_at" } } },
+          year: { $year: { $dateFromString: { dateString: "$created_at" } } },
         },
       },
       {
         $group: {
           _id: {
-            $month: { $dateFromString: { dateString: "$created_at" } },
+            month: "$month",
+            year: "$year",
           },
           totalSales: {
             $sum: { $toDouble: "$total_price_set.shop_money.amount" },
@@ -66,7 +69,10 @@ productRouter.get("/month", async (req, res) => {
         },
       },
       {
-        $sort: { _id: 1 },
+        $sort: {
+          "_id.month": 1,
+          "_id.year": 1,
+        },
       },
     ];
     const products = await shopifyOrders.aggregate(pipeline).toArray();
@@ -132,74 +138,87 @@ productRouter.get("/quater", async (req, res) => {
         $project: {
           created_at: 1,
           total_price_set: 1,
-        },
-      },
-      {
-        $addFields: {
-          quarter: {
-            $switch: {
-              branches: [
-                {
-                  case: {
-                    $lte: [
-                      {
-                        $month: {
-                          $dateFromString: { dateString: "$created_at" },
-                        },
-                      },
-                      3,
-                    ],
-                  },
-                  then: 1,
-                },
-                {
-                  case: {
-                    $lte: [
-                      {
-                        $month: {
-                          $dateFromString: { dateString: "$created_at" },
-                        },
-                      },
-                      6,
-                    ],
-                  },
-                  then: 2,
-                },
-                {
-                  case: {
-                    $lte: [
-                      {
-                        $month: {
-                          $dateFromString: { dateString: "$created_at" },
-                        },
-                      },
-                      9,
-                    ],
-                  },
-                  then: 3,
-                },
-                {
-                  case: {
-                    $lte: [
-                      {
-                        $month: {
-                          $dateFromString: { dateString: "$created_at" },
-                        },
-                      },
-                      12,
-                    ],
-                  },
-                  then: 4,
-                },
+          month: { $month: { $dateFromString: { dateString: "$created_at" } } },
+          year: { $year: { $dateFromString: { dateString: "$created_at" } } },
+          quater: {
+            $ceil: {
+              $divide: [
+                { $month: { $dateFromString: { dateString: "$created_at" } } },
+                3,
               ],
-              default: "Unknown",
             },
           },
         },
       },
+      // {
+      //   $addFields: {
+      //     quarter: {
+      //       $switch: {
+      //         branches: [
+      //           {
+      //             case: {
+      //               $lte: [
+      //                 {
+      //                   $month: {
+      //                     $dateFromString: { dateString: "$created_at" },
+      //                   },
+      //                 },
+      //                 3,
+      //               ],
+      //             },
+      //             then: 1,
+      //           },
+      //           {
+      //             case: {
+      //               $lte: [
+      //                 {
+      //                   $month: {
+      //                     $dateFromString: { dateString: "$created_at" },
+      //                   },
+      //                 },
+      //                 6,
+      //               ],
+      //             },
+      //             then: 2,
+      //           },
+      //           {
+      //             case: {
+      //               $lte: [
+      //                 {
+      //                   $month: {
+      //                     $dateFromString: { dateString: "$created_at" },
+      //                   },
+      //                 },
+      //                 9,
+      //               ],
+      //             },
+      //             then: 3,
+      //           },
+      //           {
+      //             case: {
+      //               $lte: [
+      //                 {
+      //                   $month: {
+      //                     $dateFromString: { dateString: "$created_at" },
+      //                   },
+      //                 },
+      //                 12,
+      //               ],
+      //             },
+      //             then: 4,
+      //           },
+      //         ],
+      //         default: "Unknown",
+      //       },
+      //     },
+      //   },
+      // },
       {
         $group: {
-          _id: "$quarter",
+          _id: {
+            year: "$year",
+            quater: "$quater",
+          },
           totalSales: {
             $sum: { $toDouble: "$total_price_set.shop_money.amount" },
           },
