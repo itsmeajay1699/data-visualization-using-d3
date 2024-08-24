@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import indexRouter from "./routes/index.js";
 import connectDB from "./config/db.js";
 import cors from "cors";
+import "./utils/cron-job/cron.js";
 config();
 
 const app = express();
