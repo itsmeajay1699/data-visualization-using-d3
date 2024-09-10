@@ -1,11 +1,10 @@
 import express from "express";
 import { config } from "dotenv";
+config();
 import indexRouter from "./routes/index.js";
 import connectDB from "./config/db.js";
 import cors from "cors";
-import { giveCollection } from "./utils/index.js";
-// import "./utils/cron-job/cron.js";
-config();
+import "./utils/cron-job/cron.js";
 
 const app = express();
 

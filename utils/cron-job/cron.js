@@ -1,5 +1,8 @@
 import cron from "node-cron";
+import { config } from "dotenv";
 
+config();
+console.log(process.env.BACKEND_URI_PROD);
 cron.schedule("*/8 * * * *", async () => {
   const backendUrl = process.env.BACKEND_URI_PROD;
   console.log("backendUrl", backendUrl);
