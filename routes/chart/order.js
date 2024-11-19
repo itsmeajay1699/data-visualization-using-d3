@@ -7,6 +7,7 @@ const productRouter = Router();
 productRouter.get("/day", async (req, res) => {
   try {
     const shopifyOrders = await giveCollection("shopifyOrders");
+    console.log(shopifyOrders);
     const pipeline = [
       {
         $project: {

@@ -4,7 +4,6 @@ config();
 import indexRouter from "./routes/index.js";
 import connectDB from "./config/db.js";
 import cors from "cors";
-import "./utils/cron-job/cron.js";
 
 const app = express();
 
@@ -12,11 +11,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_URL_DEV,
-      process.env.CLIENT_URL_PROD,
-      process.env.CLIENT_URL_PROD1,
-    ],
+    origin: [process.env.CLIENT_URL_DEV],
   })
 );
 
